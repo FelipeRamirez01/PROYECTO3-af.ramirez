@@ -44,13 +44,14 @@ def get_costo_producto(producto_id):
     return jsonify({'costo': producto.calcular_costo()})
 
 # Vender un producto según su ID
-@api_bp.route('/productos/<int:producto_id>/vender', methods=['POST'])
+@api_bp.route('/productos/<int:producto_id>/vender', methods=['GET','POST'])
 def vender_producto(producto_id):
-    producto = Producto.query.get_or_404(producto_id)
-    for ingrediente in producto.ingredientes:
-        ingrediente.inventario -= 1  # Ajusta la lógica según tu necesidad
-    db.session.commit()
-    return jsonify({'mensaje': f'Producto {producto.nombre} vendido con éxito.'})
+    if request.method == 'GET':
+        producto = Producto.query.get_or_404(producto_id)
+        for ingrediente in producto.ingredientes:
+            ingrediente.inventario -= 1  # Ajusta la lógica según tu necesidad
+        db.session.commit()
+        return jsonify({'mensaje': f'Producto {producto.nombre} vendido con exito.'})
 
 # Consultar todos los ingredientes
 @api_bp.route('/ingredientes', methods=['GET'])
@@ -80,32 +81,22 @@ def es_ingrediente_sano(ingrediente_id):
     return jsonify({'es_sano': ingrediente.calorias < 100 or ingrediente.es_vegetariano})
 
 # Reabastecer un ingrediente según su ID
-@api_bp.route('/ingredientes/<int:ingrediente_id>/reabastecer', methods=['GET','POST'])
-def reabastecer_ingrediente(ingrediente_id):
-    if request.method == 'POST':
-        try:
-            # Obtener el ingrediente por ID
-            ingrediente = Ingrediente.query.get_or_404(ingrediente_id)
-
-            # Validar la solicitud JSON
-            data = request.get_json()
-            if not data or 'cantidad' not in data:
-                return jsonify({'error': 'Se requiere la cantidad en la solicitud JSON.'}), 400
-
-            # Obtener la cantidad de la solicitud
-            cantidad = data.get('cantidad', 10)  # Valor por defecto: 10
-            if not isinstance(cantidad, int) or cantidad <= 0:
-                return jsonify({'error': 'La cantidad debe ser un número entero positivo.'}), 400
-
-            # Reabastecer el ingrediente
-            ingrediente.abastecer(cantidad)
-            
-            # Devolver una respuesta JSON válida
-            return jsonify({
-                'mensaje': f'Ingrediente {ingrediente.nombre} reabastecido con éxito.',
-                'nuevo_inventario': ingrediente.inventario
-            }), 200
-        
-        except Exception as e:
-            # Manejo general de errores
-            return jsonify({'error': str(e)}), 500
+@api_bp.route('/ingredientes/<int:ingrediente_id>/abastecer', methods=['GET','POST'])
+def abastecer_ingrediente(ingrediente_id):
+    
+    if request.method == 'GET':
+        ingrediente = Ingrediente.query.get(ingrediente_id)
+        ingrediente.abastecer()
+        db.session.commit()
+        return jsonify(f'El inventario de {ingrediente.nombre} ha sido abastecido con exito, Nuevo inventario es {ingrediente.inventario}', 'success')
+      
+# Reabastecer un ingrediente según su ID
+@api_bp.route('/ingredientes/<int:ingrediente_id>/renovar', methods=['GET','POST'])
+def renovar_ingrediente(ingrediente_id):
+    
+    if request.method == 'GET':
+        ingrediente = Ingrediente.query.get(ingrediente_id)
+        ingrediente.renovar_inventario()
+        db.session.commit()
+        return jsonify(f'El inventario de {ingrediente.nombre} ha sido renovar con exito, Nuevo inventario es {ingrediente.inventario}', 'success')
+      

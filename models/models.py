@@ -16,15 +16,13 @@ class Ingrediente(db.Model):
     
     def renovar_inventario(self):
         self.inventario = 0
-
           
-    def abastecer(self, cantidad=10):
+    def abastecer(self):
         if self.tipo=="base":
-            self.inventario += cantidad
-            db.session.commit()
+            self.inventario += 5
         else:
-            self.inventario += cantidad
-            db.session.commit()
+            self.inventario += 10
+            
 
 
 class Producto(db.Model):

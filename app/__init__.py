@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required
 import os
+from datetime import timedelta
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -13,6 +14,7 @@ def create_app():
 
     # Clave secreta para manejar sesiones y seguridad
     app.config['SECRET_KEY'] = os.urandom(24)  # Genera una clave aleatoria
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
     db.init_app(app)
 
