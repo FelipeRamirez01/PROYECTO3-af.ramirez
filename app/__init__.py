@@ -9,7 +9,7 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__, template_folder='../views')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/heladeria'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:xozZwtivHpsvPWUSztiwKqnpzVRsAJKZ@junction.proxy.rlwy.net:30778/heladeria'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Clave secreta para manejar sesiones y seguridad
